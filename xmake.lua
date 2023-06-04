@@ -6,7 +6,13 @@ target("learn_opengl")
     set_kind("binary")
     add_files("src/*.cpp")
     add_packages("glfw", "glad")
-    
+    add_installfiles("res/shader/*.shader")
+
+
+    after_build_files(function(target)
+        os.cp("$(projectdir)/res/", target:targetdir())
+    end)
+
 --
 -- If you want to known more usage about xmake, please see https://xmake.io
 --
