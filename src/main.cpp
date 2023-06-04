@@ -10,15 +10,53 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+static size_t CompileShader(uint32_t type, const std::string &source)
+{
+    uint32_t id = glCreateShader(type);
+    const char *src = source.c_str();
+
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    // TODO error handling
+    int result{};
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE)
+    {
+        int length{};
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char *message = (char *)alloca(length * sizeof(char));
+        glGetShaderInfoLog(id, length, &length, message);
+        std::cout << "Failed to compile" << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << std::endl;
+        std::cout << message << std::endl;
+        glDeleteShader(id);
+        return 0;
+    }
+
+    return id;
+}
+
+static int CreateShader(const std::string &vertexShader, const std::string &fragmentShader)
+{
+    uint32_t program = glCreateProgram();
+    uint32_t vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
+    uint32_t fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+    return program;
+}
+
 int main()
 {
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
     // glfw window creation
     // --------------------
@@ -29,6 +67,7 @@ int main()
         glfwTerminate();
         return -1;
     }
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -59,6 +98,28 @@ int main()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
+    std::string vertexShader =
+        "#version 330 core\n"
+        "\n"
+        "layout(location=0) in vec4 position;"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = position;\n"
+        "}\n";
+
+    std::string fragmentShader =
+        "#version 330 core\n"
+        "\n"
+        "layout(location=0) out vec4 color;"
+        "\n"
+        "void main()\n"
+        "{\n"
+        "   color = vec4(1.0,0.0,0.0,1.0);\n"
+        "}\n";
+    uint32_t shader = CreateShader(vertexShader, fragmentShader);
+    glUseProgram(shader);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -75,17 +136,13 @@ int main()
         // NOTE Draw triangle
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        // glBegin(GL_TRIANGLES);
-        // glVertex2f(-0.5f, -0.5f);
-        // glVertex2f(-0.0f, 0.5f);
-        // glVertex2f(0.5f, -0.5f);
-        // glEnd();
-
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    glDeleteProgram(shader);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
