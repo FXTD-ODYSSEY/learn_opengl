@@ -16,10 +16,6 @@ int main()
     // ------------------------------
     glfwInit();
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
@@ -43,6 +39,25 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+    std::cout << glGetString(GL_VERSION) << std::endl;
+
+    // clang-format off
+    float positions[6]{
+        -0.5f, -0.5f,
+        0.0f, 0.5f,
+        0.5f, -0.5f,
+    };
+    // clang-format on
+
+    uint32_t buffer;
+    glGenBuffers(1, &buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer);
+    // NOTE bind data into OpenGL buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+    // NOTE describe OpenGL vertex attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
     // render loop
     // -----------
@@ -58,11 +73,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // NOTE Draw triangle
-        glBegin(GL_TRIANGLES);
-        glVertex2f(-0.5f, -0.5f);
-        glVertex2f(-0.0f, 0.5f);
-        glVertex2f(0.5f, -0.5f);
-        glEnd();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // glBegin(GL_TRIANGLES);
+        // glVertex2f(-0.5f, -0.5f);
+        // glVertex2f(-0.0f, 0.5f);
+        // glVertex2f(0.5f, -0.5f);
+        // glEnd();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
