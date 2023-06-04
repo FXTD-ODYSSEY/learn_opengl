@@ -125,11 +125,18 @@ int main()
     std::cout << glGetString(GL_VERSION) << std::endl;
 
     // clang-format off
-    float positions[6]{
+    float positions[]{
         -0.5f, -0.5f,
-        0.0f, 0.5f,
         0.5f, -0.5f,
+        0.5f, 0.5f,
+        -0.5f, 0.5f,
     };
+
+    uint32_t indices[]{
+        0, 1, 2,
+        2, 3, 0,
+    };
+    size_t indices_size = sizeof indices / sizeof indices[0];
     // clang-format on
 
     uint32_t buffer;
@@ -141,6 +148,11 @@ int main()
     // NOTE describe OpenGL vertex attribute
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+    uint32_t ibo;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     ShaderProgramSource source = ParseShader("res/shader/Basic.shader");
 
@@ -161,7 +173,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         // NOTE Draw triangle
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        // glDrawArrays(GL_TRIANGLES, 0, sizeof(positions) / (sizeof(float) * 2));
+        glDrawElements(GL_TRIANGLES, indices_size, GL_UNSIGNED_INT, nullptr);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
