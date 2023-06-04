@@ -1,0 +1,6 @@
+[
+{
+  "directory": "g:\\repo\\learn_opengl",
+  "arguments": ["C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.33.31629\\bin\\HostX64\\x64\\cl.exe", "/c", "/nologo", "/O2", "/fp:fast", "/DGLFW_INCLUDE_NONE", "/EHsc", "/IC:\\Users\\weitian.liang\\AppData\\Local\\.xmake\\packages\\g\\glfw\\3.3.8\\d12e591897c9472fb7d3725fa5811388\\include", "/IC:\\Users\\weitian.liang\\AppData\\Local\\.xmake\\packages\\g\\glad\\v0.1.36\\d58ee23747ff411aae74b40986460499\\include", "/DNDEBUG", "/Fobuild\\.objs\\learn_opengl\\windows\\x64\\release\\src\\main.cpp.obj", "src\\main.cpp"],
+  "file": "src\\main.cpp"
+}]
